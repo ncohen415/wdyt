@@ -74,10 +74,11 @@ const useProvideAuth = () => {
       await removeItem("access_token")
       await removeItem("refresh_token")
       await setItem("is_logged_in", "false")
+      await setUser(null)
       await axios.post("/main/blacklist/", {
         refresh_token: refreshToken,
       })
-      // return router.replace("/login")
+      return router.replace("/login")
     } catch {}
   }
 

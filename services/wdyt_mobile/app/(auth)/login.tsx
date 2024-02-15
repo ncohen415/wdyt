@@ -12,7 +12,7 @@ type Props = {}
 const login = (props: Props) => {
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
-  const { signin, user, loggedInVerify } = useAuth()
+  const { signin, user, loggedInVerify, setUser } = useAuth()
   const { getItem } = useLocalStorage()
   const axios = useAxios()
   const router = useRouter()
@@ -23,6 +23,7 @@ const login = (props: Props) => {
     const verify = async () => {
       const res = await loggedInVerify()
       if (res?.data?.success && res?.data?.user) {
+        setUser(res?.data.user)
         router.replace(`/dashboard/${res.data.user.id}/`)
       }
     }
