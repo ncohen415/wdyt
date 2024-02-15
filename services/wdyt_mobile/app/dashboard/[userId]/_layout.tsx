@@ -1,12 +1,12 @@
 import React from "react"
-import { Stack } from "expo-router"
+import { Slot, Tabs, Stack } from "expo-router"
 
 type Props = {}
 
 const _layout = (props: Props) => {
   return (
     <Stack>
-      <Stack.Screen name="tabs" />
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
   )
 }

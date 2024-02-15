@@ -4,6 +4,7 @@ import { Platform } from "react-native"
 import { useLocalStorage } from "./useLocalStorage"
 import { Redirect } from "expo-router"
 import { useInterval } from "../util/useInterval"
+import { useRouter } from "expo-router"
 
 export interface User {
   id: string
@@ -40,6 +41,7 @@ export const useAuth = () => {
 // Provider hook that creates auth object and handles state
 const useProvideAuth = () => {
   const axios = useAxios()
+  const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [error, setError] = useState(false)
   const [lastVerifyOn, setLastVerifyOn] = useState<Date | null>(null)
@@ -58,7 +60,7 @@ const useProvideAuth = () => {
       await setItem("access_token", response.data.access)
       await setItem("refresh_token", response.data.refresh)
       setUser(response.data.user)
-      return response
+      return router.push(`/dashboard/${response?.data?.user?.id}`)
     } catch (error) {
       setError(true)
     }
@@ -68,11 +70,6 @@ const useProvideAuth = () => {
   const signout = async () => {
     try {
       const refreshToken = await getItem("refresh_token")
-      // if (webPlatform()) {
-      //   await setLocalData("is_logged_in", false)
-      // } else {
-      //   await setLocalData("is_logged_in", "false")
-      // }r
       await removeItem("access_token")
       await removeItem("refresh_token")
       await axios.post("/main/blacklist/", {
