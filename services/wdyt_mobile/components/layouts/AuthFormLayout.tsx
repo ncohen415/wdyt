@@ -44,7 +44,9 @@ const AuthFormLayout = (props: Props) => {
           <View style={styles.formContainer}>
             {props.children}
             {pathname === "/login" && (
-              <Text style={styles.forgotPassword}>Forgot Password?</Text>
+              <Link href={"/reset-password"} style={styles.forgotPassword}>
+                Forgot Password?
+              </Link>
             )}
             {props.buttonText ? (
               <Pressable style={styles.button} onPress={props.buttonOnClick}>
