@@ -8,7 +8,7 @@ from django.http import HttpResponseForbidden
 from main.serializers import (CustomUserSerializer, MyTokenObtainPairSerializer)
 
 class VerifyView(APIView):
-
+    permission_classes = []
     http_method_names = ["post"]
 
     def post(self, request, format=None):
@@ -40,11 +40,6 @@ class ObtainTokenPairWithColorView(TokenObtainPairView):
 
 class LogoutAndBlacklistRefreshTokenForUserView(APIView):
     permission_classes = []
-    permissions = {
-        "post": {
-            "public": True
-        }
-    }
     authentication_classes = ()
 
     def post(self, request):

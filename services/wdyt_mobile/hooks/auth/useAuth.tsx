@@ -59,6 +59,7 @@ const useProvideAuth = () => {
       })
       await setItem("access_token", response.data.access)
       await setItem("refresh_token", response.data.refresh)
+      await setItem("is_logged_in", "true")
       setUser(response.data.user)
       return router.push(`/dashboard/${response?.data?.user?.id}`)
     } catch (error) {
@@ -72,9 +73,11 @@ const useProvideAuth = () => {
       const refreshToken = await getItem("refresh_token")
       await removeItem("access_token")
       await removeItem("refresh_token")
+      await setItem("is_logged_in", "false")
       await axios.post("/main/blacklist/", {
         refresh_token: refreshToken,
       })
+      // return router.replace("/login")
     } catch {}
   }
 
@@ -84,6 +87,7 @@ const useProvideAuth = () => {
       if (response && response.data && response.data.success) {
         await setItem("access_token", response.data.access)
         await setItem("refresh_token", response.data.refresh)
+        await setItem("is_logged_in", "true")
         return response
       } else {
         setUser(null)
@@ -94,6 +98,7 @@ const useProvideAuth = () => {
       return false
     }
   }
+
   const isLoggedIn = async () => {
     console.log("refreshing token")
     const currentTime = new Date()

@@ -46,7 +46,6 @@ const AuthFormLayout = (props: Props) => {
             {pathname === "/login" && (
               <Text style={styles.forgotPassword}>Forgot Password?</Text>
             )}
-
             {props.buttonText ? (
               <Pressable style={styles.button} onPress={props.buttonOnClick}>
                 <Text style={styles.buttonText}>{props.buttonText}</Text>

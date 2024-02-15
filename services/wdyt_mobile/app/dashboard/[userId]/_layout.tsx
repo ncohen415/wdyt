@@ -1,5 +1,6 @@
 import React from "react"
 import { Slot, Tabs, Stack } from "expo-router"
+import ProtectedRoute from "../../../components/routes/ProtectedRoute"
 
 type Props = {}
 

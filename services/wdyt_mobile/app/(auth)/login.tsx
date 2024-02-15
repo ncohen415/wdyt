@@ -1,17 +1,33 @@
-import React, { useState, useContext } from "react"
+import React, { useState, useEffect } from "react"
 import { TextInput, StyleSheet, Button } from "react-native"
 import AuthFormLayout from "../../components/layouts/AuthFormLayout"
 import { Inputs } from "../../styles"
 import { useAuth } from "../../hooks/auth/useAuth"
 import useAxios from "../../hooks/useAxios"
+import { useLocalStorage } from "../../hooks/auth/useLocalStorage"
+import { Redirect, useRouter } from "expo-router"
 
 type Props = {}
 
 const login = (props: Props) => {
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
-  const { signin } = useAuth()
+  const { signin, user, loggedInVerify } = useAuth()
+  const { getItem } = useLocalStorage()
   const axios = useAxios()
+  const router = useRouter()
+
+  console.log(user)
+
+  useEffect(() => {
+    const verify = async () => {
+      const res = await loggedInVerify()
+      if (res?.data?.success && res?.data?.user) {
+        router.replace(`/dashboard/${res.data.user.id}/`)
+      }
+    }
+    verify()
+  }, [])
 
   return (
     <AuthFormLayout

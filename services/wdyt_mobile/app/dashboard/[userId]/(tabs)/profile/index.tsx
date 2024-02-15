@@ -1,9 +1,16 @@
 import React from "react"
-import { Text } from "react-native"
+import { Text, Button } from "react-native"
+import { useAuth } from "../../../../../hooks/auth/useAuth"
 type Props = {}
 
 const Profile = (props: Props) => {
-  return <Text>Profile</Text>
+  const { signout } = useAuth()
+  return (
+    <>
+      <Text>Profile</Text>
+      <Button title="Log Out" onPress={() => signout()} />
+    </>
+  )
 }
 
 export default Profile
