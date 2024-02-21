@@ -1,10 +1,40 @@
 import React from "react"
-import { Slot } from "expo-router"
+import { Stack } from "expo-router"
 
 type Props = {}
 
 const _layout = (props: Props) => {
-  return <Slot />
+  return (
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{
+          headerShown: false,
+          contentStyle: {
+            backgroundColor: "#ffffff",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="context/index"
+        options={{
+          headerShown: false,
+          contentStyle: {
+            backgroundColor: "#ffffff",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="answerOptions/index"
+        options={{
+          headerShown: false,
+          contentStyle: {
+            backgroundColor: "#ffffff",
+          },
+        }}
+      />
+    </Stack>
+  )
 }
 
 export default _layout

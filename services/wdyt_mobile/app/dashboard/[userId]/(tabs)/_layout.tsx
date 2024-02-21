@@ -7,7 +7,10 @@ const _layout = (props: Props) => {
   return (
     <Tabs>
       <Tabs.Screen name="index" options={{ tabBarLabel: "Home" }} />
-      <Tabs.Screen name="create" options={{ tabBarLabel: "Create" }} />
+      <Tabs.Screen
+        name="create"
+        options={{ tabBarLabel: "Create", headerShown: false }}
+      />
       <Tabs.Screen
         name="notifications"
         options={{ tabBarLabel: "Notifications" }}

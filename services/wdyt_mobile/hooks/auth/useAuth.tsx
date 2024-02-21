@@ -61,7 +61,14 @@ const useProvideAuth = () => {
       await setItem("refresh_token", response.data.refresh)
       await setItem("is_logged_in", "true")
       setUser(response.data.user)
-      return router.push(`/dashboard/${response?.data?.user?.id}`)
+      return router.push({
+        pathname: "dashboard",
+        params: {
+          userId: response?.data?.user?.id,
+        },
+
+        // `/dashboard/${response?.data?.user?.id}`
+      })
     } catch (error) {
       setError(true)
     }

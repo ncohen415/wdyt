@@ -8,7 +8,13 @@ const _layout = (props: Props) => {
   return (
     <ProtectedRoute>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="(tabs)"
+          options={{
+            headerShown: false,
+            contentStyle: { backgroundColor: "#ffffff" },
+          }}
+        />
       </Stack>
     </ProtectedRoute>
   )
