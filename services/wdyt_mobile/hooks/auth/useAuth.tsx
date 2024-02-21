@@ -101,17 +101,21 @@ const useProvideAuth = () => {
   }
 
   const isLoggedIn = async () => {
-    console.log("refreshing token")
-    const currentTime = new Date()
-    if (
-      !lastVerifyOn ||
-      currentTime.getTime() - lastVerifyOn.getTime() > 240000
-    ) {
-      setLastVerifyOn(new Date())
-      const response = await loggedInVerify()
-      return response
-    } else {
-      console.log("token has been refreshed less than 4 minutes ago")
+    const refreshToken = await getItem("refresh_token")
+    const accessToken = await getItem("access_token")
+    if (refreshToken && accessToken) {
+      console.log("refreshing token")
+      const currentTime = new Date()
+      if (
+        !lastVerifyOn ||
+        currentTime.getTime() - lastVerifyOn.getTime() > 240000
+      ) {
+        setLastVerifyOn(new Date())
+        const response = await loggedInVerify()
+        return response
+      } else {
+        console.log("token has been refreshed less than 4 minutes ago")
+      }
     }
   }
 

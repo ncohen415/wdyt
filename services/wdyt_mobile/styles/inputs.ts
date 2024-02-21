@@ -1,7 +1,7 @@
 export const base = {
   borderColor: "#d9d9d9",
   borderWidth: 1,
-  padding: 20,
+  padding: "5%",
   borderRadius: 5,
 }
 

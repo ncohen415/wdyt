@@ -17,14 +17,16 @@ const login = (props: Props) => {
   const axios = useAxios()
   const router = useRouter()
 
-  console.log(user)
-
   useEffect(() => {
     const verify = async () => {
-      const res = await loggedInVerify()
-      if (res?.data?.success && res?.data?.user) {
-        setUser(res?.data.user)
-        router.replace(`/dashboard/${res.data.user.id}/`)
+      const refreshToken = await getItem("refresh_token")
+      const accessToken = await getItem("access_token")
+      if (refreshToken && accessToken) {
+        const res = await loggedInVerify()
+        if (res?.data?.success && res?.data?.user) {
+          setUser(res?.data.user)
+          router.replace(`/dashboard/${res.data.user.id}/`)
+        }
       }
     }
     verify()
