@@ -1,23 +1,15 @@
 import React, { useState } from "react"
-import {
-  Text,
-  SafeAreaView,
-  View,
-  TextInput,
-  StyleSheet,
-  Pressable,
-} from "react-native"
+import { Text, View, SafeAreaView, Pressable, StyleSheet } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import { Containers, Inputs, Colors, Buttons } from "../../../../../styles"
 import { useRouter, usePathname, useLocalSearchParams } from "expo-router"
+import { Containers, Buttons, Inputs, Colors } from "../../../../../styles"
 import { useAuth } from "../../../../../hooks/auth/useAuth"
-
 type Props = {}
 
-const Create = (props: Props) => {
+const Answers = (props: Props) => {
   const router = useRouter()
-  const [question, setQuestion] = useState<string>("")
   const { user } = useAuth()
+  const { question, context } = useLocalSearchParams()
   return (
     <SafeAreaView style={styles.mainContainer}>
       <KeyboardAwareScrollView
@@ -25,21 +17,15 @@ const Create = (props: Props) => {
         contentContainerStyle={styles.scrollContainer}
       >
         <View style={styles.innerWrapper}>
-          <Text style={styles.heading}>What's on your mind?</Text>
-          <TextInput
-            style={{ ...styles.input, ...Inputs.spacing }}
-            onChangeText={(text) => setQuestion(text)}
-            placeholder="Question"
-            value={question}
-            autoCapitalize="none"
-          />
+          <Text>answers</Text>
           <Pressable
             style={styles.button}
             onPress={() =>
               router.replace({
-                pathname: `dashboard/${user?.id}/create/context`,
+                pathname: `dashboard/${user?.id}/create/answers`,
                 params: {
-                  question: encodeURIComponent(question),
+                  question: question,
+                  context: context,
                 },
               })
             }
@@ -52,7 +38,7 @@ const Create = (props: Props) => {
   )
 }
 
-export default Create
+export default Answers
 
 const styles = StyleSheet.create<any>({
   mainContainer: {

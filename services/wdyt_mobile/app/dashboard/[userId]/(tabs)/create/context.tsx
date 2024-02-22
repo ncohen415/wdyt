@@ -1,22 +1,22 @@
 import React, { useState } from "react"
 import {
   Text,
-  SafeAreaView,
-  View,
   TextInput,
-  StyleSheet,
+  View,
+  SafeAreaView,
   Pressable,
+  StyleSheet,
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import { Containers, Inputs, Colors, Buttons } from "../../../../../styles"
 import { useRouter, usePathname, useLocalSearchParams } from "expo-router"
+import { Containers, Buttons, Inputs, Colors } from "../../../../../styles"
 import { useAuth } from "../../../../../hooks/auth/useAuth"
-
 type Props = {}
 
-const Create = (props: Props) => {
+const Context = (props: Props) => {
+  const [context, setContext] = useState<string>("")
   const router = useRouter()
-  const [question, setQuestion] = useState<string>("")
+  const { question } = useLocalSearchParams()
   const { user } = useAuth()
   return (
     <SafeAreaView style={styles.mainContainer}>
@@ -27,19 +27,22 @@ const Create = (props: Props) => {
         <View style={styles.innerWrapper}>
           <Text style={styles.heading}>What's on your mind?</Text>
           <TextInput
-            style={{ ...styles.input, ...Inputs.spacing }}
-            onChangeText={(text) => setQuestion(text)}
-            placeholder="Question"
-            value={question}
-            autoCapitalize="none"
+            editable
+            multiline
+            numberOfLines={4}
+            onChangeText={(text) => setContext(text)}
+            placeholder="Give us some context"
+            value={context}
+            style={{ padding: 10 }}
           />
           <Pressable
             style={styles.button}
             onPress={() =>
               router.replace({
-                pathname: `dashboard/${user?.id}/create/context`,
+                pathname: `dashboard/${user?.id}/create/answers`,
                 params: {
-                  question: encodeURIComponent(question),
+                  question: question,
+                  context: encodeURIComponent(context),
                 },
               })
             }
@@ -52,7 +55,7 @@ const Create = (props: Props) => {
   )
 }
 
-export default Create
+export default Context
 
 const styles = StyleSheet.create<any>({
   mainContainer: {

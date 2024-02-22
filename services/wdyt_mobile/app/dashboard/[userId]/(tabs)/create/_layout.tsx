@@ -16,7 +16,7 @@ const _layout = (props: Props) => {
         }}
       />
       <Stack.Screen
-        name="context/index"
+        name="context"
         options={{
           headerShown: false,
           contentStyle: {
@@ -25,7 +25,7 @@ const _layout = (props: Props) => {
         }}
       />
       <Stack.Screen
-        name="answerOptions/index"
+        name="answers"
         options={{
           headerShown: false,
           contentStyle: {
