@@ -1,40 +1,29 @@
 import React, { useState, useEffect } from "react"
-import {
-  Text,
-  TextInput,
-  View,
-  SafeAreaView,
-  Pressable,
-  StyleSheet,
-} from "react-native"
+import { Text, SafeAreaView, View, Pressable, StyleSheet } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import { Picker } from "@react-native-picker/picker"
 import {
-  useRouter,
-  useLocalSearchParams,
-  usePathname,
-  useNavigation,
-} from "expo-router"
-import { Containers, Buttons, Inputs, Colors } from "../../../../../styles"
-import { useAuth } from "../../../../../hooks/auth/useAuth"
-import useAxios from "../../../../../hooks/useAxios"
-import { useLocalStorage } from "../../../../../hooks/auth/useLocalStorage"
-import { setItem } from "expo-secure-store"
+  Containers,
+  Inputs,
+  Buttons,
+  Colors,
+} from "../../../../../../../styles"
+import useAxios from "../../../../../../../hooks/useAxios"
+import { useAuth } from "../../../../../../../hooks/auth/useAuth"
+import { useLocalSearchParams, useRouter, usePathname } from "expo-router"
 
 type Props = {}
 
-const Context = (props: Props) => {
-  const router = useRouter()
+const MultipleChoice = (props: Props) => {
+  const { user } = useAuth()
   const axios = useAxios()
   const pathname = usePathname()
-  const navigation = useNavigation()
   const { param_question_id } = useLocalSearchParams()
-  const [context, setContext] = useState<string>("")
-  const [questionId, setQuestionId] = useState<number | null>(null)
-  const { setItem } = useLocalStorage()
-  const { user } = useAuth()
+  const router = useRouter()
+  const [numberSelection, setNumberSelection] = useState<number | null>(null)
 
   useEffect(() => {
-    const getContext = async () => {
+    const getQuestion = async () => {
       if (param_question_id !== undefined) {
         const res = await axios.get(`/main/questions/`, {
           params: {
@@ -42,37 +31,30 @@ const Context = (props: Props) => {
           },
         })
         if (res.data) {
-          const data = res.data[0]
-          setContext(data.context)
+          if (res.data[0].multiple_choice_number_of_options === null) {
+            setNumberSelection(2)
+          } else {
+            setNumberSelection(res.data[0].multiple_choice_number_of_options)
+          }
         }
       }
     }
-    getContext()
-  }, [])
-
-  useEffect(() => {
-    navigation.addListener("beforeRemove", (e) => {
-      e.preventDefault()
-      console.log(param_question_id)
-      if (param_question_id !== undefined) {
-        setItem("stored_question_id", param_question_id?.toString())
-      }
-      navigation.dispatch(e.data.action)
-    })
-  }, [])
+    getQuestion()
+  }, [pathname])
 
   const goNext = async () => {
     if (param_question_id !== undefined) {
       const res = await axios.patch(`/main/questions/${param_question_id}/`, {
-        context: context,
-        asker: user?.id,
         question_id: param_question_id,
+        asker: user?.id,
+        multiple_choice_number_of_options: numberSelection,
       })
       if (res.status === 201) {
         router.push({
-          pathname: `dashboard/${user?.slug}/create/answers`,
+          pathname: `dashboard/${user?.slug}/create/answers/multi/options`,
           params: {
-            param_question_id: param_question_id,
+            question_id: param_question_id,
+            number_selection: numberSelection,
           },
         })
       }
@@ -87,7 +69,7 @@ const Context = (props: Props) => {
       const res = await axios.patch(`/main/questions/${param_question_id}/`, {
         asker: user?.id,
         question_id: param_question_id,
-        context: context,
+        multiple_choice_number_of_options: numberSelection,
       })
       if (res.status === 201) {
         router.replace({
@@ -100,11 +82,6 @@ const Context = (props: Props) => {
     }
   }
 
-  const discard = () => {
-    // if question id: delete request to delete question > remove id from local storage > reroute home
-    // if param question id: delete request to delete question > reroute home
-  }
-
   return (
     <SafeAreaView style={styles.mainContainer}>
       <KeyboardAwareScrollView
@@ -112,23 +89,29 @@ const Context = (props: Props) => {
         contentContainerStyle={styles.scrollContainer}
       >
         <View style={styles.innerWrapper}>
-          <Text style={styles.heading}>Give us some context.</Text>
-          <TextInput
-            editable
-            multiline
-            numberOfLines={4}
-            onChangeText={(text) => setContext(text)}
-            placeholder="Give us some context"
-            value={context}
-            style={{ padding: 10 }}
-          />
+          <View style={styles.headingContainer}>
+            <Text style={styles.heading}>Select your number of choices.</Text>
+            <Text style={styles.subHeading}>Minimum of 2. Maximum of 4.</Text>
+          </View>
+          <View style={{ width: "100%", height: 200 }}>
+            {numberSelection !== null && (
+              <Picker
+                selectedValue={numberSelection}
+                onValueChange={(value: number) => setNumberSelection(value)}
+              >
+                <Picker.Item label={"2"} value={2} />
+                <Picker.Item label={"3"} value={3} />
+                <Picker.Item label={"4"} value={4} />
+              </Picker>
+            )}
+          </View>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
             <Pressable
-              disabled={context.length < 1}
+              disabled={numberSelection === null}
               style={
-                context.length < 1
+                numberSelection === null
                   ? { ...styles.button, ...styles.disabled }
                   : styles.button
               }
@@ -137,9 +120,9 @@ const Context = (props: Props) => {
               <Text style={styles.buttonText}>Discard</Text>
             </Pressable>
             <Pressable
-              disabled={context.length < 1}
+              disabled={numberSelection === null}
               style={
-                context.length < 1
+                numberSelection === null
                   ? { ...styles.button, ...styles.disabled }
                   : styles.button
               }
@@ -148,9 +131,9 @@ const Context = (props: Props) => {
               <Text style={styles.buttonText}>Save</Text>
             </Pressable>
             <Pressable
-              disabled={context.length < 1}
+              disabled={numberSelection === null}
               style={
-                context.length < 1
+                numberSelection === null
                   ? { ...styles.button, ...styles.disabled }
                   : styles.button
               }
@@ -165,7 +148,7 @@ const Context = (props: Props) => {
   )
 }
 
-export default Context
+export default MultipleChoice
 
 const styles = StyleSheet.create<any>({
   mainContainer: {
@@ -190,14 +173,16 @@ const styles = StyleSheet.create<any>({
     color: Colors.jet,
     marginBottom: 20,
   },
-  disabled: {
-    opacity: 0.6,
-  },
   buttonText: {
     color: "white",
   },
+  headingContainer: {},
   heading: {
     fontSize: 40,
     fontWeight: "bold",
+    marginBottom: 5,
+  },
+  subHeading: {
+    fontSize: 17,
   },
 })

@@ -25,7 +25,7 @@ const login = (props: Props) => {
         const res = await loggedInVerify()
         if (res?.data?.success && res?.data?.user) {
           setUser(res?.data.user)
-          router.replace(`/dashboard/${res.data.user.id}/`)
+          router.replace(`/dashboard/${res.data.user.slug}/`)
         }
       }
     }

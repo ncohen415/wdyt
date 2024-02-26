@@ -1,15 +1,10 @@
-import React, { useState } from "react"
-import { Text, View, SafeAreaView, Pressable, StyleSheet } from "react-native"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import { useRouter, usePathname, useLocalSearchParams } from "expo-router"
+import React from "react"
+import { Text, SafeAreaView, View, Pressable, StyleSheet } from "react-native"
 import { Containers, Buttons, Inputs, Colors } from "../../../../../styles"
-import { useAuth } from "../../../../../hooks/auth/useAuth"
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 type Props = {}
 
-const Answers = (props: Props) => {
-  const router = useRouter()
-  const { user } = useAuth()
-  const { question, context } = useLocalSearchParams()
+const Success = (props: Props) => {
   return (
     <SafeAreaView style={styles.mainContainer}>
       <KeyboardAwareScrollView
@@ -17,20 +12,11 @@ const Answers = (props: Props) => {
         contentContainerStyle={styles.scrollContainer}
       >
         <View style={styles.innerWrapper}>
-          <Text>answers</Text>
-          <Pressable
-            style={styles.button}
-            onPress={() =>
-              router.replace({
-                pathname: `dashboard/${user?.id}/create/answers`,
-                params: {
-                  question: question,
-                  context: context,
-                },
-              })
-            }
-          >
-            <Text style={styles.buttonText}>Next</Text>
+          <View style={styles.headingContainer}>
+            <Text style={styles.heading}>Success!</Text>
+          </View>
+          <Pressable style={styles.button} disabled={false} onPress={() => {}}>
+            <Text style={styles.buttonText}>Go Home</Text>
           </Pressable>
         </View>
       </KeyboardAwareScrollView>
@@ -38,7 +24,7 @@ const Answers = (props: Props) => {
   )
 }
 
-export default Answers
+export default Success
 
 const styles = StyleSheet.create<any>({
   mainContainer: {
@@ -65,8 +51,13 @@ const styles = StyleSheet.create<any>({
   buttonText: {
     color: "white",
   },
+  headingContainer: {},
   heading: {
     fontSize: 40,
     fontWeight: "bold",
+    marginBottom: 5,
+  },
+  subHeading: {
+    fontSize: 17,
   },
 })

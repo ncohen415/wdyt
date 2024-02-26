@@ -1,40 +1,29 @@
 import React, { useState, useEffect } from "react"
-import {
-  Text,
-  TextInput,
-  View,
-  SafeAreaView,
-  Pressable,
-  StyleSheet,
-} from "react-native"
+import { Text, View, SafeAreaView, Pressable, StyleSheet } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import {
-  useRouter,
-  useLocalSearchParams,
-  usePathname,
-  useNavigation,
-} from "expo-router"
-import { Containers, Buttons, Inputs, Colors } from "../../../../../styles"
-import { useAuth } from "../../../../../hooks/auth/useAuth"
-import useAxios from "../../../../../hooks/useAxios"
-import { useLocalStorage } from "../../../../../hooks/auth/useLocalStorage"
-import { setItem } from "expo-secure-store"
+import { useRouter, usePathname, useLocalSearchParams } from "expo-router"
+import { Containers, Buttons, Inputs, Colors } from "../../../../../../styles"
+import { useAuth } from "../../../../../../hooks/auth/useAuth"
+import useAxios from "../../../../../../hooks/useAxios"
+import { Picker } from "@react-native-picker/picker"
+import { Question } from "../../../../../../types/types"
+import { useLocalStorage } from "../../../../../../hooks/auth/useLocalStorage"
 
 type Props = {}
 
-const Context = (props: Props) => {
-  const router = useRouter()
+const Answers = (props: Props) => {
   const axios = useAxios()
+  const router = useRouter()
   const pathname = usePathname()
-  const navigation = useNavigation()
-  const { param_question_id } = useLocalSearchParams()
-  const [context, setContext] = useState<string>("")
-  const [questionId, setQuestionId] = useState<number | null>(null)
-  const { setItem } = useLocalStorage()
   const { user } = useAuth()
+  const { param_question_id } = useLocalSearchParams()
+  const { getItem } = useLocalStorage()
+  const [question, setQuestion] = useState<Question>()
+  const [questionId, setQuestionId] = useState<number | null>(null)
+  const [selectedResponseType, setSelectedResponseType] = useState<string>("")
 
   useEffect(() => {
-    const getContext = async () => {
+    const getQuestion = async () => {
       if (param_question_id !== undefined) {
         const res = await axios.get(`/main/questions/`, {
           params: {
@@ -42,39 +31,49 @@ const Context = (props: Props) => {
           },
         })
         if (res.data) {
-          const data = res.data[0]
-          setContext(data.context)
+          setQuestion(res.data[0])
+          if (res.data[0].response_type === null) {
+            setSelectedResponseType(res?.data[0]?.response_types[0])
+          } else {
+            setSelectedResponseType(res?.data[0]?.response_type)
+          }
         }
       }
     }
-    getContext()
-  }, [])
 
-  useEffect(() => {
-    navigation.addListener("beforeRemove", (e) => {
-      e.preventDefault()
-      console.log(param_question_id)
-      if (param_question_id !== undefined) {
-        setItem("stored_question_id", param_question_id?.toString())
-      }
-      navigation.dispatch(e.data.action)
-    })
-  }, [])
+    getQuestion()
+  }, [pathname])
 
   const goNext = async () => {
     if (param_question_id !== undefined) {
       const res = await axios.patch(`/main/questions/${param_question_id}/`, {
-        context: context,
         asker: user?.id,
         question_id: param_question_id,
+        response_type: selectedResponseType,
       })
       if (res.status === 201) {
-        router.push({
-          pathname: `dashboard/${user?.slug}/create/answers`,
-          params: {
-            param_question_id: param_question_id,
-          },
-        })
+        if (selectedResponseType === "Yes/No") {
+          router.push({
+            pathname: `dashboard/${user?.slug}/create/answers/yes-no`,
+            params: {
+              param_question_id: param_question_id,
+            },
+          })
+        } else if (selectedResponseType === "Multiple Choice") {
+          router.push({
+            pathname: `dashboard/${user?.slug}/create/answers/multi`,
+            params: {
+              param_question_id: param_question_id,
+            },
+          })
+        } else if (selectedResponseType === "Words Only") {
+          router.push({
+            pathname: `dashboard/${user?.slug}/create/answers/words`,
+            params: {
+              param_question_id: param_question_id,
+            },
+          })
+        }
       }
       if (res.status === 401) {
         console.log(res.error)
@@ -87,7 +86,7 @@ const Context = (props: Props) => {
       const res = await axios.patch(`/main/questions/${param_question_id}/`, {
         asker: user?.id,
         question_id: param_question_id,
-        context: context,
+        response_type: selectedResponseType,
       })
       if (res.status === 201) {
         router.replace({
@@ -100,11 +99,6 @@ const Context = (props: Props) => {
     }
   }
 
-  const discard = () => {
-    // if question id: delete request to delete question > remove id from local storage > reroute home
-    // if param question id: delete request to delete question > reroute home
-  }
-
   return (
     <SafeAreaView style={styles.mainContainer}>
       <KeyboardAwareScrollView
@@ -112,23 +106,35 @@ const Context = (props: Props) => {
         contentContainerStyle={styles.scrollContainer}
       >
         <View style={styles.innerWrapper}>
-          <Text style={styles.heading}>Give us some context.</Text>
-          <TextInput
-            editable
-            multiline
-            numberOfLines={4}
-            onChangeText={(text) => setContext(text)}
-            placeholder="Give us some context"
-            value={context}
-            style={{ padding: 10 }}
-          />
+          <Text style={styles.heading}>How do you want your answer?</Text>
+          <View style={{ width: "100%", height: 200 }}>
+            <Picker
+              selectedValue={selectedResponseType}
+              onValueChange={(responseType: string, index: number) =>
+                setSelectedResponseType(responseType)
+              }
+            >
+              {question?.response_types?.map(
+                (responseType: string, index: number) => {
+                  return (
+                    <Picker.Item
+                      key={index}
+                      label={responseType}
+                      value={responseType}
+                    />
+                  )
+                }
+              )}
+            </Picker>
+            {/* ADD CHECKBOX TO ALLOW EXPLANATIONS OR NOT */}
+          </View>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
             <Pressable
-              disabled={context.length < 1}
+              disabled={selectedResponseType.length < 1}
               style={
-                context.length < 1
+                selectedResponseType.length < 1
                   ? { ...styles.button, ...styles.disabled }
                   : styles.button
               }
@@ -137,9 +143,9 @@ const Context = (props: Props) => {
               <Text style={styles.buttonText}>Discard</Text>
             </Pressable>
             <Pressable
-              disabled={context.length < 1}
+              disabled={selectedResponseType.length < 1}
               style={
-                context.length < 1
+                selectedResponseType.length < 1
                   ? { ...styles.button, ...styles.disabled }
                   : styles.button
               }
@@ -148,9 +154,9 @@ const Context = (props: Props) => {
               <Text style={styles.buttonText}>Save</Text>
             </Pressable>
             <Pressable
-              disabled={context.length < 1}
+              disabled={selectedResponseType.length < 1}
               style={
-                context.length < 1
+                selectedResponseType.length < 1
                   ? { ...styles.button, ...styles.disabled }
                   : styles.button
               }
@@ -165,7 +171,7 @@ const Context = (props: Props) => {
   )
 }
 
-export default Context
+export default Answers
 
 const styles = StyleSheet.create<any>({
   mainContainer: {
@@ -189,9 +195,6 @@ const styles = StyleSheet.create<any>({
     flex: 0.3,
     color: Colors.jet,
     marginBottom: 20,
-  },
-  disabled: {
-    opacity: 0.6,
   },
   buttonText: {
     color: "white",

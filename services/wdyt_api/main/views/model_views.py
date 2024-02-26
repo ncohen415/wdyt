@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from main.serializers import CustomUserSerializer
-from main.models import CustomUser
+from main.serializers import (CustomUserSerializer, AnswerSerializer, QuestionSerializer, MultipleChoiceOptionSerializer)
+from main.models import (CustomUser, Question, MultipleChoiceOption)
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -39,3 +39,88 @@ class CustomUserViewSet(viewsets.ModelViewSet):
                 )
 
             return Response({"success": "Successfully added user."}, status=status.HTTP_201_CREATED)
+        
+
+class QuestionViewSet(viewsets.ModelViewSet):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    http_method_names = ["get", "list", "post", "patch", "delete"]
+
+    def get_queryset(self):
+        queryset = Question.objects.all()
+        question_id = self.request.query_params.get("question_id", None)
+        if question_id is not None:
+            queryset = queryset.filter(id=question_id)
+
+        return queryset
+        
+
+    def create(self, request):
+        title = self.request.data.get("title", None)
+        asker = self.request.data.get("asker", None)
+        question = None
+
+        if asker is None:
+            return Response({"error": "You must have an account to ask questions"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        if asker is not None and title is not None:
+            question = Question.objects.create(title=title, asker_id=asker)
+
+        if question is not None:
+            return Response({"success": "Successfully submitted question", "question_id": QuestionSerializer(question).data["id"]}, status=status.HTTP_201_CREATED)
+        
+
+    def update(self, request, *args, **kwargs):
+        question_id = self.request.data.get("question_id", None)
+        title = self.request.data.get("title", None)
+        context = self.request.data.get("context", None)
+        response_type = self.request.data.get("response_type", None)
+        asker = self.request.data.get("asker", None)
+        multiple_choice_number_of_options = self.request.data.get("multiple_choice_number_of_options", None)
+        confirmed = self.request.data.get("confirmed", None)
+        question = Question.objects.get(id=question_id)
+
+        if asker is None:
+            return Response({"error": "You must have an account to ask questions"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        if title is not None:
+            question.title = title
+            question.save()
+
+        if context is not None and question is not None:
+            question.context = context
+            question.save()
+
+        if response_type is not None and question is not None:
+            question.response_type = response_type
+            question.save()
+
+        if multiple_choice_number_of_options is not None and question is not None:
+            question.multiple_choice_number_of_options = multiple_choice_number_of_options
+            question.save()
+
+        if confirmed is not None:
+            question.confirmed = confirmed
+            question.save()
+
+        if question is not None:
+            return Response({"success": "Successfully updated question"}, status=status.HTTP_201_CREATED)
+        
+
+class MultipleChoiceOptionViewSet(viewsets.ModelViewSet):
+    queryset = MultipleChoiceOption.objects.all()
+    serializer_class = MultipleChoiceOptionSerializer
+    http_method_names = ["get", "list", "post", "patch", "delete"]
+
+    def create(self, reuqest):
+        question_id = self.request.data.get("question_id", None)
+        options = self.request.data.get("options", None)
+
+        if options is not None and question_id is not None:
+            for option in options:
+                MultipleChoiceOption.objects.create(question_id=question_id, option=option)
+            return Response({"success": "Options created"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"error": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
+
+

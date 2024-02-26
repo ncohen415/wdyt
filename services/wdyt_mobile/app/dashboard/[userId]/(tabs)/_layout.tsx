@@ -9,7 +9,11 @@ const _layout = (props: Props) => {
       <Tabs.Screen name="index" options={{ tabBarLabel: "Home" }} />
       <Tabs.Screen
         name="create"
-        options={{ tabBarLabel: "Create", headerShown: false }}
+        options={{
+          tabBarLabel: "Create",
+          headerShown: false,
+          unmountOnBlur: true,
+        }}
       />
       <Tabs.Screen
         name="notifications"

@@ -18,11 +18,13 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import  TokenRefreshView, TokenVerifyView
 # from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from main.views.auth_views import (VerifyView, ObtainTokenPairWithColorView, LogoutAndBlacklistRefreshTokenForUserView)
-from main.views.model_views import (CustomUserViewSet)
+from main.views.model_views import (CustomUserViewSet, QuestionViewSet, MultipleChoiceOptionViewSet)
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register(r"custom-users", CustomUserViewSet, basename="custom-users")
+router.register(r"questions", QuestionViewSet, basename="questions")
+router.register(r"multiple-choice-options", MultipleChoiceOptionViewSet, basename="multiple-choice-options")
 
 urlpatterns = [
     # LOGIN

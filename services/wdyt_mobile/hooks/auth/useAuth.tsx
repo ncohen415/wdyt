@@ -5,25 +5,9 @@ import { useLocalStorage } from "./useLocalStorage"
 import { Redirect } from "expo-router"
 import { useInterval } from "../util/useInterval"
 import { useRouter } from "expo-router"
+import { User, AuthContext } from "../../types/types"
 
-export interface User {
-  id: string
-  first_name: string
-  last_name: string
-  email: string
-  phone: string
-}
-
-type Context = {
-  signin: Function
-  signout: Function
-  user: User | null
-  setUser: Function
-  error: boolean
-  loggedInVerify: Function
-}
-
-const authContext = createContext<Context>({} as Context)
+const authContext = createContext<AuthContext>({} as AuthContext)
 // Provider component that wraps your app and makes auth object ...
 // ... available to any child component that calls useAuth().
 
@@ -64,10 +48,8 @@ const useProvideAuth = () => {
       return router.push({
         pathname: "dashboard",
         params: {
-          userId: response?.data?.user?.id,
+          slug: response?.data?.user?.slug,
         },
-
-        // `/dashboard/${response?.data?.user?.id}`
       })
     } catch (error) {
       setError(true)
