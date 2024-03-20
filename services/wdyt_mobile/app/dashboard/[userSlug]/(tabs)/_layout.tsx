@@ -19,7 +19,14 @@ const _layout = (props: Props) => {
         name="notifications"
         options={{ tabBarLabel: "Notifications" }}
       />
-      <Tabs.Screen name="profile" options={{ tabBarLabel: "Profile" }} />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          tabBarLabel: "Profile",
+          headerShown: false,
+          unmountOnBlur: true,
+        }}
+      />
     </Tabs>
   )
 }

@@ -13,11 +13,12 @@ import {
   useLocalSearchParams,
   usePathname,
   useNavigation,
+  useGlobalSearchParams,
 } from "expo-router"
-import { Containers, Buttons, Inputs, Colors } from "../../../../../styles"
-import { useAuth } from "../../../../../hooks/auth/useAuth"
-import useAxios from "../../../../../hooks/useAxios"
-import { useLocalStorage } from "../../../../../hooks/auth/useLocalStorage"
+import { Containers, Buttons, Inputs, Colors } from "../../../../../../styles"
+import { useAuth } from "../../../../../../hooks/auth/useAuth"
+import useAxios from "../../../../../../hooks/useAxios"
+import { useLocalStorage } from "../../../../../../hooks/auth/useLocalStorage"
 import { setItem } from "expo-secure-store"
 
 type Props = {}
@@ -27,23 +28,24 @@ const Context = (props: Props) => {
   const axios = useAxios()
   const pathname = usePathname()
   const navigation = useNavigation()
-  const { param_question_id } = useLocalSearchParams()
+  const { questionId } = useGlobalSearchParams()
   const [context, setContext] = useState<string>("")
-  const [questionId, setQuestionId] = useState<number | null>(null)
   const { setItem } = useLocalStorage()
   const { user } = useAuth()
 
   useEffect(() => {
     const getContext = async () => {
-      if (param_question_id !== undefined) {
+      if (questionId !== undefined) {
         const res = await axios.get(`/main/questions/`, {
           params: {
-            question_id: param_question_id,
+            question_id: questionId,
           },
         })
         if (res.data) {
           const data = res.data[0]
-          setContext(data.context)
+          if (data.context) {
+            setContext(data.context)
+          }
         }
       }
     }
@@ -53,40 +55,36 @@ const Context = (props: Props) => {
   useEffect(() => {
     navigation.addListener("beforeRemove", (e) => {
       e.preventDefault()
-      console.log(param_question_id)
-      if (param_question_id !== undefined) {
-        setItem("stored_question_id", param_question_id?.toString())
+      if (questionId !== undefined) {
+        setItem("stored_question_id", questionId?.toString())
       }
       navigation.dispatch(e.data.action)
     })
   }, [])
 
   const goNext = async () => {
-    if (param_question_id !== undefined) {
-      const res = await axios.patch(`/main/questions/${param_question_id}/`, {
+    if (questionId !== undefined) {
+      const res = await axios.patch(`/main/questions/${questionId}/`, {
         context: context,
         asker: user?.id,
-        question_id: param_question_id,
+        question_id: questionId,
       })
       if (res.status === 201) {
         router.push({
-          pathname: `dashboard/${user?.slug}/create/answers`,
-          params: {
-            param_question_id: param_question_id,
-          },
+          pathname: `dashboard/${user?.slug}/create/${questionId}/answers`,
         })
       }
       if (res.status === 401) {
-        console.log(res.error)
+        console.log(res.data.error)
       }
     }
   }
 
   const addToDrafts = async () => {
-    if (param_question_id !== undefined) {
-      const res = await axios.patch(`/main/questions/${param_question_id}/`, {
+    if (questionId !== undefined) {
+      const res = await axios.patch(`/main/questions/${questionId}/`, {
         asker: user?.id,
-        question_id: param_question_id,
+        question_id: questionId,
         context: context,
       })
       if (res.status === 201) {
@@ -95,7 +93,7 @@ const Context = (props: Props) => {
         })
       }
       if (res.status === 401) {
-        console.log(res.error)
+        console.log(res.data.error)
       }
     }
   }
@@ -112,16 +110,17 @@ const Context = (props: Props) => {
         contentContainerStyle={styles.scrollContainer}
       >
         <View style={styles.innerWrapper}>
-          <Text style={styles.heading}>Give us some context.</Text>
-          <TextInput
-            editable
-            multiline
-            numberOfLines={4}
-            onChangeText={(text) => setContext(text)}
-            placeholder="Give us some context"
-            value={context}
-            style={{ padding: 10 }}
-          />
+          <View>
+            <Text style={styles.heading}>Give us some context.</Text>
+            <TextInput
+              editable
+              multiline
+              numberOfLines={4}
+              onChangeText={(text) => setContext(text)}
+              placeholder="Give us some context"
+              value={context}
+            />
+          </View>
           <View
             style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
@@ -181,6 +180,7 @@ const styles = StyleSheet.create<any>({
   innerWrapper: {
     flex: 1,
     justifyContent: "space-between",
+    paddingTop: 15,
   },
   button: {
     backgroundColor: Colors.jet,
@@ -199,5 +199,6 @@ const styles = StyleSheet.create<any>({
   heading: {
     fontSize: 40,
     fontWeight: "bold",
+    marginBottom: 15,
   },
 })

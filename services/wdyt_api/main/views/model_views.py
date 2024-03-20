@@ -3,6 +3,7 @@ from main.serializers import (CustomUserSerializer, AnswerSerializer, QuestionSe
 from main.models import (CustomUser, Question, MultipleChoiceOption)
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import action
 
 class CustomUserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
@@ -49,8 +50,12 @@ class QuestionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Question.objects.all()
         question_id = self.request.query_params.get("question_id", None)
+        asker_id = self.request.query_params.get('asker_id', None)
         if question_id is not None:
             queryset = queryset.filter(id=question_id)
+
+        if asker_id is not None:
+            queryset = queryse= queryset.filter(asker_id=asker_id)
 
         return queryset
         
@@ -75,6 +80,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
         title = self.request.data.get("title", None)
         context = self.request.data.get("context", None)
         response_type = self.request.data.get("response_type", None)
+        allow_explanation = self.request.data.get("allow_explanation", None)
         asker = self.request.data.get("asker", None)
         multiple_choice_number_of_options = self.request.data.get("multiple_choice_number_of_options", None)
         confirmed = self.request.data.get("confirmed", None)
@@ -95,6 +101,15 @@ class QuestionViewSet(viewsets.ModelViewSet):
             question.response_type = response_type
             question.save()
 
+
+        if question is not None:
+            if allow_explanation is None:
+                question.allow_explanation = False
+                question.save()
+            else:
+                question.allow_explanation = allow_explanation
+                question.save()
+
         if multiple_choice_number_of_options is not None and question is not None:
             question.multiple_choice_number_of_options = multiple_choice_number_of_options
             question.save()
@@ -112,7 +127,16 @@ class MultipleChoiceOptionViewSet(viewsets.ModelViewSet):
     serializer_class = MultipleChoiceOptionSerializer
     http_method_names = ["get", "list", "post", "patch", "delete"]
 
-    def create(self, reuqest):
+
+    def get_queryset(self):
+        queryset = MultipleChoiceOption.objects.all()
+        question_id = self.request.query_params.get("question_id", None)
+        if question_id is not None:
+            queryset = queryset.filter(id=question_id)
+
+        return queryset
+
+    def create(self, request):
         question_id = self.request.data.get("question_id", None)
         options = self.request.data.get("options", None)
 
@@ -120,6 +144,21 @@ class MultipleChoiceOptionViewSet(viewsets.ModelViewSet):
             for option in options:
                 MultipleChoiceOption.objects.create(question_id=question_id, option=option)
             return Response({"success": "Options created"}, status=status.HTTP_201_CREATED)
+        else:
+            return Response({"error": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
+
+            
+    @action(detail=False, methods=["post"])
+    def update_existing_multiple_choice_options(self, request):
+        question_id = self.request.data.get("question_id", None)
+        options = self.request.data.get("options", None)
+
+        if options is not None and question_id is not None:
+            for option in options:
+                option_to_update = MultipleChoiceOption.objects.get(id=option["id"])
+                option_to_update.option = option["option"]
+                option_to_update.save()
+            return Response({"success": "Options created"}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST)
 

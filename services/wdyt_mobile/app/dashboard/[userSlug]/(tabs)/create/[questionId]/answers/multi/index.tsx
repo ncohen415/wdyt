@@ -7,10 +7,15 @@ import {
   Inputs,
   Buttons,
   Colors,
-} from "../../../../../../../styles"
-import useAxios from "../../../../../../../hooks/useAxios"
-import { useAuth } from "../../../../../../../hooks/auth/useAuth"
-import { useLocalSearchParams, useRouter, usePathname } from "expo-router"
+} from "../../../../../../../../styles"
+import useAxios from "../../../../../../../../hooks/useAxios"
+import { useAuth } from "../../../../../../../../hooks/auth/useAuth"
+import {
+  useLocalSearchParams,
+  useRouter,
+  usePathname,
+  useGlobalSearchParams,
+} from "expo-router"
 
 type Props = {}
 
@@ -18,16 +23,16 @@ const MultipleChoice = (props: Props) => {
   const { user } = useAuth()
   const axios = useAxios()
   const pathname = usePathname()
-  const { param_question_id } = useLocalSearchParams()
+  const { questionId } = useGlobalSearchParams()
   const router = useRouter()
   const [numberSelection, setNumberSelection] = useState<number | null>(null)
 
   useEffect(() => {
     const getQuestion = async () => {
-      if (param_question_id !== undefined) {
+      if (questionId !== undefined) {
         const res = await axios.get(`/main/questions/`, {
           params: {
-            question_id: param_question_id,
+            question_id: questionId,
           },
         })
         if (res.data) {
@@ -43,32 +48,28 @@ const MultipleChoice = (props: Props) => {
   }, [pathname])
 
   const goNext = async () => {
-    if (param_question_id !== undefined) {
-      const res = await axios.patch(`/main/questions/${param_question_id}/`, {
-        question_id: param_question_id,
+    if (questionId !== undefined) {
+      const res = await axios.patch(`/main/questions/${questionId}/`, {
+        question_id: questionId,
         asker: user?.id,
         multiple_choice_number_of_options: numberSelection,
       })
       if (res.status === 201) {
         router.push({
-          pathname: `dashboard/${user?.slug}/create/answers/multi/options`,
-          params: {
-            question_id: param_question_id,
-            number_selection: numberSelection,
-          },
+          pathname: `dashboard/${user?.slug}/create/${questionId}/answers/multi/options`,
         })
       }
       if (res.status === 401) {
-        console.log(res.error)
+        console.log(res.data.error)
       }
     }
   }
 
   const addToDrafts = async () => {
-    if (param_question_id !== undefined) {
-      const res = await axios.patch(`/main/questions/${param_question_id}/`, {
+    if (questionId !== undefined) {
+      const res = await axios.patch(`/main/questions/${questionId}/`, {
         asker: user?.id,
-        question_id: param_question_id,
+        question_id: questionId,
         multiple_choice_number_of_options: numberSelection,
       })
       if (res.status === 201) {
@@ -77,9 +78,12 @@ const MultipleChoice = (props: Props) => {
         })
       }
       if (res.status === 401) {
-        console.log(res.error)
+        console.log(res.data.error)
       }
     }
+  }
+  const discard = async () => {
+    await console.log("discarding")
   }
 
   return (
@@ -164,6 +168,7 @@ const styles = StyleSheet.create<any>({
   innerWrapper: {
     flex: 1,
     justifyContent: "space-between",
+    paddingTop: 15,
   },
   button: {
     backgroundColor: Colors.jet,
@@ -172,6 +177,9 @@ const styles = StyleSheet.create<any>({
     flex: 0.3,
     color: Colors.jet,
     marginBottom: 20,
+  },
+  disabled: {
+    opacity: 0.6,
   },
   buttonText: {
     color: "white",

@@ -5,10 +5,6 @@ import Header from "../../../../../components/header/header"
 
 type Props = {}
 
-export const unstable_settings = {
-  initialRouteName: "dashboard/[userId]/create/indexrou",
-}
-
 const _layout = (props: Props) => {
   return (
     <Stack>
@@ -25,6 +21,112 @@ const _layout = (props: Props) => {
         }}
       />
       <Stack.Screen
+        name="[questionId]/context"
+        options={{
+          headerTitle: "",
+          headerBackVisible: true,
+          headerLeft: () => (
+            <Text style={{ fontSize: 30, fontWeight: "bold" }}>WDYT?</Text>
+          ),
+          contentStyle: {
+            backgroundColor: "#ffffff",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="[questionId]/summary"
+        options={{
+          headerTitle: "",
+          headerBackVisible: true,
+          headerLeft: () => (
+            <Text style={{ fontSize: 30, fontWeight: "bold" }}>WDYT?</Text>
+          ),
+          contentStyle: {
+            backgroundColor: "#ffffff",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="[questionId]/success"
+        options={{
+          headerTitle: "",
+          headerBackVisible: true,
+          headerLeft: () => (
+            <Text style={{ fontSize: 30, fontWeight: "bold" }}>WDYT?</Text>
+          ),
+          contentStyle: {
+            backgroundColor: "#ffffff",
+          },
+        }}
+      />
+
+      <Stack.Screen
+        name="[questionId]/answers/index"
+        options={{
+          headerTitle: "",
+          headerBackVisible: true,
+          headerLeft: () => (
+            <Text style={{ fontSize: 30, fontWeight: "bold" }}>WDYT?</Text>
+          ),
+          contentStyle: {
+            backgroundColor: "#ffffff",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="[questionId]/answers/multi/index"
+        options={{
+          headerTitle: "",
+          headerBackVisible: true,
+          headerLeft: () => (
+            <Text style={{ fontSize: 30, fontWeight: "bold" }}>WDYT?</Text>
+          ),
+          contentStyle: {
+            backgroundColor: "#ffffff",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="[questionId]/answers/multi/options"
+        options={{
+          headerTitle: "",
+          headerBackVisible: true,
+          headerLeft: () => (
+            <Text style={{ fontSize: 30, fontWeight: "bold" }}>WDYT?</Text>
+          ),
+          contentStyle: {
+            backgroundColor: "#ffffff",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="[questionId]/answers/words/index"
+        options={{
+          headerTitle: "",
+          headerBackVisible: true,
+          headerLeft: () => (
+            <Text style={{ fontSize: 30, fontWeight: "bold" }}>WDYT?</Text>
+          ),
+          contentStyle: {
+            backgroundColor: "#ffffff",
+          },
+        }}
+      />
+      <Stack.Screen
+        name="[questionId]/answers/yes-no/index"
+        options={{
+          headerTitle: "",
+          headerBackVisible: true,
+          headerLeft: () => (
+            <Text style={{ fontSize: 30, fontWeight: "bold" }}>WDYT?</Text>
+          ),
+          contentStyle: {
+            backgroundColor: "#ffffff",
+          },
+        }}
+      />
+
+      {/* <Stack.Screen
         name="context"
         options={{
           headerTitle: "",
@@ -128,7 +230,7 @@ const _layout = (props: Props) => {
             backgroundColor: "#ffffff",
           },
         }}
-      />
+      /> */}
     </Stack>
   )
 }

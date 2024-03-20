@@ -46,7 +46,7 @@ const useProvideAuth = () => {
       await setItem("is_logged_in", "true")
       setUser(response.data.user)
       return router.push({
-        pathname: "dashboard",
+        pathname: `dashboard/${response?.data?.user?.slug}`,
         params: {
           slug: response?.data?.user?.slug,
         },

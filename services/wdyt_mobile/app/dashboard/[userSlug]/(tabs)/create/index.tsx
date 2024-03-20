@@ -22,15 +22,15 @@ const Create = (props: Props) => {
   const [questionId, setQuestionId] = useState<number | null>(null)
   const [title, setTitle] = useState<string>("")
   const { user } = useAuth()
-  const { param_question_id } = useLocalSearchParams()
+  const { local_question_id } = useLocalSearchParams()
   const { getItem, removeItem } = useLocalStorage()
 
   useEffect(() => {
     const getTitle = async () => {
-      if (param_question_id !== undefined) {
+      if (local_question_id !== undefined) {
         const res = await axios.get(`/main/questions/`, {
           params: {
-            question_id: param_question_id,
+            local_question_id: local_question_id,
           },
         })
         if (res.data) {
@@ -38,8 +38,6 @@ const Create = (props: Props) => {
           setTitle(data.title)
         }
       }
-
-      // await removeItem("stored_question_id")
     }
     getTitle()
   }, [])
@@ -50,7 +48,7 @@ const Create = (props: Props) => {
       if (
         stored_question_id !== null &&
         stored_question_id !== undefined &&
-        param_question_id === undefined
+        local_question_id === undefined
       ) {
         console.log("running")
         await setQuestionId(parseInt(stored_question_id))
@@ -61,23 +59,17 @@ const Create = (props: Props) => {
   }, [pathname])
 
   const goNext = async () => {
-    if (param_question_id !== undefined) {
-      console.log("patch from param passed")
-      const res = await axios.patch(`/main/questions/${param_question_id}/`, {
+    if (local_question_id !== undefined) {
+      console.log("updaing question from profile")
+      const res = await axios.patch(`/main/questions/${local_question_id}/`, {
         asker: user?.id,
-        question_id: param_question_id,
+        question_id: local_question_id,
         title: title,
       })
       if (res.status === 201) {
         router.push({
-          pathname: `dashboard/${user?.slug}/create/context`,
-          params: {
-            param_question_id: param_question_id,
-          },
+          pathname: `dashboard/${user?.slug}/create/${local_question_id}/context`,
         })
-      }
-      if (res.status === 401) {
-        console.log(res.error)
       }
     }
     if (questionId !== null && questionId !== undefined) {
@@ -89,19 +81,16 @@ const Create = (props: Props) => {
       })
       if (res.status === 201) {
         router.push({
-          pathname: `dashboard/${user?.slug}/create/context`,
-          params: {
-            param_question_id: questionId,
-          },
+          pathname: `dashboard/${user?.slug}/create/${questionId}/context`,
         })
       }
       if (res.status === 401) {
-        console.log(res.error)
+        console.log(res.data.error)
       }
     }
     if (
       (questionId === null || questionId === undefined) &&
-      param_question_id === undefined
+      local_question_id === undefined
     ) {
       console.log("new question")
       const res = await axios.post("/main/questions/", {
@@ -110,21 +99,21 @@ const Create = (props: Props) => {
       })
       if (res.status === 201) {
         router.push({
-          pathname: `dashboard/${user?.slug}/create/context`,
+          pathname: `dashboard/${user?.slug}/create/${res.data.question_id}/context`,
           params: {
             param_question_id: res.data.question_id,
           },
         })
       }
       if (res.status === 401) {
-        console.log(res.error)
+        console.log(res.data.error)
       }
     }
   }
 
   const addToDrafts = async () => {
-    if (param_question_id !== undefined) {
-      const res = await axios.patch(`/main/questions/${questionId}/`, {
+    if (local_question_id !== undefined) {
+      const res = await axios.patch(`/main/questions/${local_question_id}/`, {
         asker: user?.id,
         question_id: questionId,
         title: title,
@@ -135,7 +124,7 @@ const Create = (props: Props) => {
         })
       }
       if (res.status === 401) {
-        console.log(res.error)
+        console.log(res.data.error)
       }
     } else {
       const res = await axios.post("/main/questions/", {
@@ -149,7 +138,7 @@ const Create = (props: Props) => {
         })
       }
       if (res.status === 401) {
-        console.log(res.error)
+        console.log(res.data.error)
       }
     }
   }
@@ -233,6 +222,7 @@ const styles = StyleSheet.create<any>({
   innerWrapper: {
     flex: 1,
     justifyContent: "space-between",
+    paddingTop: 15,
   },
   button: {
     backgroundColor: Colors.jet,

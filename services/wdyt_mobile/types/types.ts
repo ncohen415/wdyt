@@ -16,6 +16,12 @@ export type AuthContext = {
   loggedInVerify: Function
 }
 
+export type MultipleChoiceOption = {
+  question?: Question
+  option: string
+  id: number
+}
+
 export interface Question {
   title: string
   context: string
@@ -26,4 +32,5 @@ export interface Question {
   allow_explanation: boolean
   confirmed: boolean
   multiple_choice_number_of_options?: number
+  multiple_choice_options?: Array<MultipleChoiceOption>
 }

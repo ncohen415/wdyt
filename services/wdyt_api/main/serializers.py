@@ -44,11 +44,20 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     response_types = serializers.SerializerMethodField()
     asker = CustomUserSerializer()
+    multiple_choice_options = serializers.SerializerMethodField()
 
     def get_response_types(self, instance):
-        # [{'key': tup[0], 'value': tup[1]} for tup in tuple_of_tuples]
         to_json_array = [tup[0] for tup in RESPONSE_TYPES]
         return to_json_array
+    
+    def get_multiple_choice_options(self, instance):
+        choices = []
+        multiple_choice_options = MultipleChoiceOption.objects.filter(question_id=instance.id)
+        if len(multiple_choice_options) > 0:
+            for option in multiple_choice_options:
+                choices.append({"option": option.option, "id": option.id})
+        # return MultipleChoiceOptionSerializer(choices, many=True).data
+        return choices
     
 
 class AnswerSerializer(serializers.ModelSerializer):

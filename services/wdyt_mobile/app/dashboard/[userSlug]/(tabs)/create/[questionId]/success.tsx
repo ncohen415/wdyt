@@ -1,6 +1,6 @@
 import React from "react"
 import { Text, SafeAreaView, View, Pressable, StyleSheet } from "react-native"
-import { Containers, Buttons, Inputs, Colors } from "../../../../../styles"
+import { Containers, Buttons, Inputs, Colors } from "../../../../../../styles"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 type Props = {}
 
@@ -40,6 +40,7 @@ const styles = StyleSheet.create<any>({
   innerWrapper: {
     flex: 1,
     justifyContent: "space-between",
+    paddingTop: 15,
   },
   button: {
     backgroundColor: Colors.jet,

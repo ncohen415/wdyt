@@ -16,6 +16,7 @@ class Command(BaseCommand):
 
         print("creating superusers")
         UserModel = get_user_model()
+        print("creating nate")
         user_n = UserModel.objects.create_superuser(
             first_name="Nate",
             last_name="Cohen",
@@ -23,6 +24,7 @@ class Command(BaseCommand):
             password="abcd!1234",
             is_staff=True
         )
+        print("creating abe")
         user_a = UserModel.objects.create_superuser(
             first_name="Abe",
             last_name="Post-Hyatt",
