@@ -23,6 +23,7 @@ export type MultipleChoiceOption = {
 }
 
 export interface Question {
+  id: number
   title: string
   context: string
   response_type: string

@@ -46,6 +46,7 @@ const Summary = (props: Props) => {
       console.log(res.data.error)
     }
   }
+  console.log("allow explanation", question?.allow_explanation)
 
   return (
     <SafeAreaView style={styles.mainContainer}>

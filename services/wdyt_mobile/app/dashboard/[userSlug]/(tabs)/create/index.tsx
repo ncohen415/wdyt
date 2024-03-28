@@ -9,7 +9,12 @@ import {
 } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { Containers, Inputs, Colors, Buttons } from "../../../../../styles"
-import { useRouter, usePathname, useLocalSearchParams } from "expo-router"
+import {
+  useRouter,
+  usePathname,
+  useLocalSearchParams,
+  useNavigation,
+} from "expo-router"
 import { useAuth } from "../../../../../hooks/auth/useAuth"
 import useAxios from "../../../../../hooks/useAxios"
 import { useLocalStorage } from "../../../../../hooks/auth/useLocalStorage"
@@ -19,6 +24,7 @@ const Create = (props: Props) => {
   const router = useRouter()
   const axios = useAxios()
   const pathname = usePathname()
+  const navigation = useNavigation()
   const [questionId, setQuestionId] = useState<number | null>(null)
   const [title, setTitle] = useState<string>("")
   const { user } = useAuth()
@@ -30,7 +36,7 @@ const Create = (props: Props) => {
       if (local_question_id !== undefined) {
         const res = await axios.get(`/main/questions/`, {
           params: {
-            local_question_id: local_question_id,
+            question_id: parseInt(local_question_id),
           },
         })
         if (res.data) {
@@ -40,6 +46,12 @@ const Create = (props: Props) => {
       }
     }
     getTitle()
+  }, [])
+
+  useEffect(() => {
+    navigation.addListener("blur", (e) => {
+      setTitle("")
+    })
   }, [])
 
   useEffect(() => {

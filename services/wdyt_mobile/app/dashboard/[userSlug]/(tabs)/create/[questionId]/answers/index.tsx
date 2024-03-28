@@ -58,6 +58,11 @@ const Answers = (props: Props) => {
         asker: user?.id,
         question_id: questionId,
         response_type: selectedResponseType,
+        allow_explanation:
+          selectedResponseType === "Yes/No" ||
+          selectedResponseType === "Multiple Choice"
+            ? allowExplanation
+            : null,
       })
       if (res.status === 201) {
         if (selectedResponseType === "Yes/No") {
@@ -79,7 +84,6 @@ const Answers = (props: Props) => {
       }
     }
   }
-  console.log(selectedResponseType)
   const addToDrafts = async () => {
     if (questionId !== undefined) {
       const res = await axios.patch(`/main/questions/${questionId}/`, {
@@ -102,6 +106,14 @@ const Answers = (props: Props) => {
       }
     }
   }
+
+  console.log(
+    "check",
+    selectedResponseType === "Yes/No" ||
+      selectedResponseType === "Multiple Choice"
+      ? allowExplanation
+      : null
+  )
 
   const discard = async () => {}
 

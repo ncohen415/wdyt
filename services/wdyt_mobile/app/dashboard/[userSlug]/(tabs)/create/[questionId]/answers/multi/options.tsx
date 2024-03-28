@@ -64,7 +64,6 @@ const MultipleChoiceOptions = (props: Props) => {
         })
         if (res.data) {
           const data = res.data[0]
-          console.log(data.multiple_choice_options.length)
           if (data.multiple_choice_options.length > 0) {
             setOptions(res.data[0]?.multiple_choice_options)
           } else {
@@ -75,9 +74,6 @@ const MultipleChoiceOptions = (props: Props) => {
     }
     getQuestion()
   }, [focused])
-
-  console.log("options", options)
-  console.log("focused", focused)
 
   const updateOption = (
     text: string,

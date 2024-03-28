@@ -38,7 +38,7 @@ class Question(models.Model):
     response_type = models.CharField(default=None, choices=RESPONSE_TYPES, max_length=150, blank=True, null=True)
     asker = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    allow_explanation = models.BooleanField(default=True, null=True)
+    allow_explanation = models.BooleanField(default=True, null=True, blank=True)
     multiple_choice_number_of_options = models.IntegerField(blank=True, null=True)
     confirmed = models.BooleanField(default=False, blank=True, null=True)
 

@@ -101,14 +101,9 @@ class QuestionViewSet(viewsets.ModelViewSet):
             question.response_type = response_type
             question.save()
 
-
-        if question is not None:
-            if allow_explanation is None:
-                question.allow_explanation = False
-                question.save()
-            else:
-                question.allow_explanation = allow_explanation
-                question.save()
+        if allow_explanation is not None and question is not None:
+            question.allow_explanation = allow_explanation
+            question.save()
 
         if multiple_choice_number_of_options is not None and question is not None:
             question.multiple_choice_number_of_options = multiple_choice_number_of_options
