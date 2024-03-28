@@ -79,7 +79,7 @@ const Answers = (props: Props) => {
       }
     }
   }
-
+  console.log(selectedResponseType)
   const addToDrafts = async () => {
     if (questionId !== undefined) {
       const res = await axios.patch(`/main/questions/${questionId}/`, {
